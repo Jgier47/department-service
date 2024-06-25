@@ -20,15 +20,19 @@ public class DepartmentServiceImpl implements DepartmentService {
 
   @Override
   public DepartmentDto saveDepartment(DepartmentDto departmentDto) {
+    checkIfDepartmentAlreadyExists(departmentDto);
+
+    return departmentMapper.departmentToDepartmentDto(
+        departmentRepository.save(departmentMapper.departmentDtoToDepartment(departmentDto)));
+  }
+
+  private void checkIfDepartmentAlreadyExists(DepartmentDto departmentDto) {
     Optional<Department> department =
         departmentRepository.findByDepartmentCode(departmentDto.getDepartmentCode());
     if (department.isPresent())
       throw new DepartmentAlreadyExistsException(
           String.format(
               "Department with code %s already exists", departmentDto.getDepartmentCode()));
-
-    return departmentMapper.departmentToDepartmentDto(
-        departmentRepository.save(departmentMapper.departmentDtoToDepartment(departmentDto)));
   }
 
   @Override
